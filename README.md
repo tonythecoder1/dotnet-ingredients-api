@@ -91,19 +91,6 @@ GET /rangos/2/ingredientes
 3. **Hot Reload Fails:**
    - Restart the server using `Ctrl + R` or stop and start the app again with `dotnet watch run`.
 
-## How to Push Code to GitHub Using Visual Studio Code
-
-1. Open the terminal in VS Code.
-2. Run the following commands:
-   ```bash
-   git init          # Initialize the repo (if not already done)
-   git add .         # Stage all changes
-   git commit -m "Initial commit"  # Commit your changes
-   git remote add origin <repository-url>  # Link your repo
-   git push origin main     # Push the changes
-   ```
-
-If you have issues, check for authentication errors or branch conflicts.
 
 ## Contact
 For any questions or issues, feel free to open an issue or contact the project owner.
