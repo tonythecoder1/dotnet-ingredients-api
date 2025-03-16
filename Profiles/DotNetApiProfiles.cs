@@ -13,14 +13,14 @@ namespace dot_net_api.Migrations.Profiles
 
         public DotNetApiProfiles()
         {
-             CreateMap<Rango, RangoDTO>().ReverseMap();
-             CreateMap<Ingrediente, IngredientesDTOP>()
+            CreateMap<Rango, RangoDTO>().ReverseMap();
+            CreateMap<Rango, RangoForCreationDTO>().ReverseMap();
+            CreateMap<Rango, RangoForCreationUpdateDTO>().ReverseMap();
+            CreateMap<Ingrediente, IngredientesDTOP>()
                 .ForMember(d => d.RangoId, 
                            o => o.MapFrom(s => s.Rangos.Any() ? s.Rangos.First().Id : 0))
                 .ForMember(d => d.Nome, 
                            o => o.MapFrom(s => s.Nome));
-                     
-
         }
 
     }
