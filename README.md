@@ -1,3 +1,5 @@
+#THIS IS NOT THE FINAL VERSION - STILL IN DEVELOPMENT
+
 # Dot Net API Project
 
 This project is a .NET API built using Entity Framework, AutoMapper, and SQLite. It provides endpoints for managing `Rangos` and `Ingredientes`.
