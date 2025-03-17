@@ -7,6 +7,7 @@ using AutoMapper;
 using dot_net_api.Models;
 using dot_net_api.EndpointHandler;
 using dot_net_api.Extensions;
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,20 @@ builder.Services.AddDbContext<RangoDbContext>(options =>
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
+
+if(!app.Environment.IsDevelopment()){
+
+app.UseExceptionHandler(configureApplicationBuilder => 
+    configureApplicationBuilder.Run(
+            async context => {
+                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
+                context.Response.ContentType = "text/html";
+                await context.Response.WriteAsync("Unexpected Error");
+            }
+    )
+
+);
+}
 
 app.MapGet("/", () => ".NET ONLINE");
 
