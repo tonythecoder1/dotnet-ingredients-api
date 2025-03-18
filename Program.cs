@@ -20,17 +20,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 var app = builder.Build();
 
 if(!app.Environment.IsDevelopment()){
-
-app.UseExceptionHandler(configureApplicationBuilder => 
-    configureApplicationBuilder.Run(
-            async context => {
-                context.Response.StatusCode = (int) HttpStatusCode.InternalServerError;
-                context.Response.ContentType = "text/html";
-                await context.Response.WriteAsync("Unexpected Error");
-            }
-    )
-
-);
+    app.UseExceptionHandler();
 }
 
 app.MapGet("/", () => ".NET ONLINE");

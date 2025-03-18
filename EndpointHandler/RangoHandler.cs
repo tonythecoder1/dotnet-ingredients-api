@@ -16,9 +16,10 @@ namespace dot_net_api.EndpointHandler;
 public class RangoHandler
 {
     public static async Task<Results<NoContent, Ok<IEnumerable<RangoDTO>>>> GetRangosAsync(
-        RangoDbContext rangodbcontext, 
+        [FromServices] RangoDbContext rangodbcontext, 
         [FromQuery] string? rangoNome,
-        IMapper mapper)
+        [FromServices] IMapper mapper, 
+        [FromServices] ILogger<RangoHandler> logger) // Corrigido para vir de [FromServices]
     {
         if (string.IsNullOrWhiteSpace(rangoNome))
             return TypedResults.NoContent();
@@ -28,16 +29,22 @@ public class RangoHandler
                                     .ToListAsync();
 
         if (!rangosEntity.Any())
+        {
+            logger.LogInformation($"Receita não encontrada: {rangoNome}");
             return TypedResults.NoContent();
-
-        return TypedResults.Ok(mapper.Map<IEnumerable<RangoDTO>>(rangosEntity));
+        }
+        else
+        {
+            logger.LogInformation("Receita encontrada");
+            return TypedResults.Ok(mapper.Map<IEnumerable<RangoDTO>>(rangosEntity));
+        }
     }
 
     public static async Task<IResult> PostRango(
-        RangoDbContext rangoDbContext,
-        IMapper mapper,
+        [FromServices] RangoDbContext rangoDbContext,
+        [FromServices] IMapper mapper,
         [FromBody] RangoForCreationDTO rangoForCreationDTO,
-        LinkGenerator linkGenerator,
+        [FromServices] LinkGenerator linkGenerator,
         HttpContext httpContext)
     {
         var rangoEntity = mapper.Map<Rango>(rangoForCreationDTO);
@@ -50,53 +57,53 @@ public class RangoHandler
         return Results.Created(linkToReturn ?? string.Empty, rangoToReturn);
     }
 
-    public static async Task<Results<NotFound, Ok<RangoDTO>>> PutRango (
-    RangoDbContext rangodbcontext, 
-    IMapper mapper, 
-    int id,
-    [FromBody] RangoForCreationUpdateDTO rangoForCreationUpdateDTO)
-{
-    var rangosEntity = await rangodbcontext.Rangos.FirstOrDefaultAsync(x => x.Id == id);
-
-    if (rangosEntity == null)
-        return TypedResults.NotFound();
-
-    mapper.Map(rangoForCreationUpdateDTO, rangosEntity);
-    await rangodbcontext.SaveChangesAsync();
-
-    var rangoToReturn = mapper.Map<RangoDTO>(rangosEntity);
-    return TypedResults.Ok(rangoToReturn); 
-}
-
-    public static async Task<Results<NotFound, NoContent>> DeleteRango (
-    RangoDbContext rangodbcontext, 
-    int id) 
-{
-    var rangosEntity = await rangodbcontext.Rangos.FirstOrDefaultAsync(x => x.Id == id);
-
-    if (rangosEntity == null){
-        return TypedResults.NotFound();
-    }
-
-    rangodbcontext.Rangos.Remove(rangosEntity);
-    await rangodbcontext.SaveChangesAsync();
-    
-    return TypedResults.NoContent(); 
-}
-
-   public static async Task<IResult> GetRango(RangoDbContext rangodbcontext, int id, IMapper mapper) 
+    public static async Task<Results<NotFound, Ok<RangoDTO>>> PutRango(
+        [FromServices] RangoDbContext rangodbcontext, 
+        [FromServices] IMapper mapper, 
+        int id,
+        [FromBody] RangoForCreationUpdateDTO rangoForCreationUpdateDTO)
     {
-    var rango = await rangodbcontext.Rangos.FirstOrDefaultAsync(x => x.Id == id);
+        var rangosEntity = await rangodbcontext.Rangos.FirstOrDefaultAsync(x => x.Id == id);
 
-    if (rango == null)
+        if (rangosEntity == null)
+            return TypedResults.NotFound();
+
+        mapper.Map(rangoForCreationUpdateDTO, rangosEntity);
+        await rangodbcontext.SaveChangesAsync();
+
+        var rangoToReturn = mapper.Map<RangoDTO>(rangosEntity);
+        return TypedResults.Ok(rangoToReturn); 
+    }
+
+    public static async Task<Results<NotFound, NoContent>> DeleteRango(
+        [FromServices] RangoDbContext rangodbcontext, 
+        int id) 
     {
-        return Results.NotFound();
+        var rangosEntity = await rangodbcontext.Rangos.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (rangosEntity == null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        rangodbcontext.Rangos.Remove(rangosEntity);
+        await rangodbcontext.SaveChangesAsync();
+
+        return TypedResults.NoContent(); 
     }
 
-    return Results.Ok(mapper.Map<RangoDTO>(rango));
+    public static async Task<IResult> GetRango(
+        [FromServices] RangoDbContext rangodbcontext, 
+        int id, 
+        [FromServices] IMapper mapper)
+    {
+        var rango = await rangodbcontext.Rangos.FirstOrDefaultAsync(x => x.Id == id);
+
+        if (rango == null)
+        {
+            return Results.NotFound();
+        }
+
+        return Results.Ok(mapper.Map<RangoDTO>(rango));
     }
-
-
-    
 }
-
